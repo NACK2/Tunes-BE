@@ -9,6 +9,7 @@
 - Copy your `Client ID` and `Client secret`
 
 ### Setting your Client ID and Client secret as local environment variables
+- We are storing our client credentials in our local envs, and then our Tunes application will access them through our local envs; this will keep them secure
 Windows:
 - Open command prompt and enter the following:
 
