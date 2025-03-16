@@ -4,7 +4,7 @@
 ### To obtain Spotify credentials (needed for spotify API):
 - Go to [Spotify's developer dashboard](https://developer.spotify.com/dashboard) and sign in
 - Click "Create app"
-- In "Redirect URIs" enter: http://localhost:8080/api/v1/spotify/callback
+- Under "Redirect URIs" enter: http://localhost:8080/api/v1/spotify/callback (Name whatever you want for other required fields)
 - Once created, click on your new Spotify app's settings (should be in top right)
 - Copy your `Client ID` and `Client secret`
 
