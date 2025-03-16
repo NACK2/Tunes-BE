@@ -1,6 +1,9 @@
 # Backend for Tunes Media Player
 
 ## Local Development
+- JDK version 23
+- Apache Maven version 3.9.9
+
 ### To obtain Spotify credentials (needed for spotify API):
 - Go to [Spotify's developer dashboard](https://developer.spotify.com/dashboard) and sign in
 - Click "Create app"
@@ -26,6 +29,10 @@ Windows:
 
 Mac:
 - todo
+
+### To run locally:
+- ```mvn clean install```
+- Run application
 
 ### Flow of Spotify OAuth Authorization Endpoints: 
 - [Visualization of Spotify API Authorization](https://developer-assets.spotifycdn.com/images/documentation/web-api/auth-code-flow.png)
