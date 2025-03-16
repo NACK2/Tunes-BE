@@ -9,7 +9,8 @@
 - Copy your `Client ID` and `Client secret`
 
 ### Setting your Client ID and Client secret as local environment variables
-- We are storing our client credentials in our local envs, and then our Tunes application will access them through our local envs; this will keep them secure
+- Notes: We are storing our client credentials in our local envs, and then our Tunes application will access them through our local envs; this will keep them secure
+  
 Windows:
 - Open command prompt and enter the following:
 
@@ -21,3 +22,6 @@ Windows:
 - Type `echo $SPOTIFY_ID` and `echo $SPOTIFY_SECRET` to confirm credentials have been saved correctly
 - Now that you've set your environment variables, the Tunes application should be able to access your credentials and Spotify APIs will be called with your Spotify Account (under `application.properties`)
 - (If unable to still run application, a computer restart may be required to save environment variables properly)
+
+Mac:
+- todo
