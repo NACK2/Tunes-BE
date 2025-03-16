@@ -1,6 +1,7 @@
 # Backend for Tunes Media Player
 
 ## Local Development
+Versions needed:
 - JDK version 23
 - Apache Maven version 3.9.9
 
