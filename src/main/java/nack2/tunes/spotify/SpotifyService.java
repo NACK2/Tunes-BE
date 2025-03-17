@@ -57,7 +57,7 @@ public class SpotifyService {
         return ResponseEntity.ok(code);
     }
 
-    public ResponseEntity<String> getAccessToken(String authCode) {
+    public String getAccessToken(String authCode) {
         String url = "https://accounts.spotify.com/api/token";
         String redirectUrl = API_BASE_URL + "/spotify/callback";
 
@@ -66,19 +66,15 @@ public class SpotifyService {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        headers.setBasicAuth(base64Credentials) ;
+        headers.setBasicAuth(base64Credentials);
 
-//        String body = "grant_type=client_credentials&client_id="+ clientId + "&client_secret=" + clientSecret;
         String body = "grant_type=authorization_code&code="+ authCode + "&redirect_uri=" + redirectUrl;
 
         HttpEntity<String> entity = new HttpEntity<>(body, headers);
 
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> result = restTemplate.postForEntity(url, entity, String.class); // entity contains entire response; msg, code, etc.
+        String result = restTemplate.postForObject(url, entity, String.class);
 
-        JSONObject resultJson = new JSONObject(result.getBody());
-        String accessToken = resultJson.getString("access_token");
-
-        return ResponseEntity.ok(accessToken);
+        return new JSONObject(result).getString("access_token");
     }
 }
