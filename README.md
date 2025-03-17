@@ -37,8 +37,8 @@ Mac:
 
 ### Flow of Spotify OAuth Authorization Endpoints: 
 - [Visualization of Spotify API Authorization](https://developer-assets.spotifycdn.com/images/documentation/web-api/auth-code-flow.png)
-  1) Call GET `/api/v1/spotify/login` will direct user to Spotify and ask them to authorize
-  2) Once authorized, user will be redirected to `/api/v1/spotify/callback` with an authentication code in the uri query parameter (e.g. `/api/v1/spotify/callback?code={whatevercodehere`)
-  3) GET `api/v1/spotify/callback` will automatically return the auth code (no need to call it) from it's the query parameter after user is redirected here from step 1
-  4) Call POST `api/v1/spotify/token` with auth code (received in step 3) in the body, should receive access token
-  5) Authorization done! Use the access token for all futuer Spotify API calls
+  1) Call GET `/api/v1/spotify/auth`, this endpoint will send the client to Spotify and ask them to authorize their account
+  2) Once authorized, client will be redirected to `/api/v1/spotify/callback`, this endpoint will return the authorization code in the url's query parameter (e.g. `/api/v1/spotify/callback?code={whatevercodehere`) 
+     - Note: Don't need to call GET `/api/v1/spotify/callback`, user is automatically redirected here after authorizing through Spotify
+  3) Call POST `/api/v1/spotify/token` with auth code (received in step 3) in the body, should receive access token
+  4) Authorization done! Use the access token for all future Spotify API calls
