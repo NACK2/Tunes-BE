@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Base64;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -48,15 +49,17 @@ public class SpotifyService {
         String state = request.getParameter("state");
 
         if (code == null || code.isEmpty()) {
-            throw new Exception("Authorization code is missing");
+            throw new Exception("Missing authorization code is in query parameters");
+        } else if (state == null || state.isEmpty()) {
+            throw new Exception("Missing state in query parameters");
         } else if (!this.state.equals(state)) {
-            throw new Exception("Invalid state");
+            throw new Exception("Incorrect state in query parameters");
         }
 
         return code;
     }
 
-    public String getAccessToken(String authCode) {
+    public String getAccessToken(Map<String, String> authCode) throws Exception {
         String url = "https://accounts.spotify.com/api/token";
         String redirectUrl = API_BASE_URL + "/spotify/callback";
 
@@ -66,14 +69,16 @@ public class SpotifyService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.setBasicAuth(base64Credentials);
-
-        String body = "grant_type=authorization_code&code="+ authCode + "&redirect_uri=" + redirectUrl;
+        String body = "grant_type=authorization_code&code="+ authCode.get("authCode") + "&redirect_uri=" + redirectUrl;
 
         HttpEntity<String> entity = new HttpEntity<>(body, headers);
 
-        RestTemplate restTemplate = new RestTemplate();
-        String result = restTemplate.postForObject(url, entity, String.class);
-
-        return new JSONObject(result).getString("access_token");
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            String result = restTemplate.postForObject(url, entity, String.class);
+            return new JSONObject(result).getString("access_token");
+        } catch (Exception e) {
+            throw new Exception("Invalid authorization code");
+        }
     }
 }

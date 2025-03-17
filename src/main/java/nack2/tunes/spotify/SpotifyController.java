@@ -34,24 +34,41 @@ public class SpotifyController {
     @GetMapping(path="callback")
     public HttpEntity<Map<String, String>> getAuthCode(HttpServletRequest request) {
         Map<String, String> result = new HashMap<>();
+        result.put("path", "/api/v1/spotify/callback");
 
         try {
             String authCode = spotifyService.getAuthCode(request);
             result.put("authCode", authCode);
+            result.put("status", HttpStatus.OK.toString());
             return ResponseEntity.status(HttpStatus.OK).body(result);
         } catch(Exception e) {
             result.put("error", e.getMessage());
+            result.put("status", HttpStatus.BAD_REQUEST.toString());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
         }
     }
 
 
     @PostMapping(path="token")
-    public ResponseEntity<Map<String, String>> getAccessToken(@RequestBody String authCode) {
-        String accessToken = spotifyService.getAccessToken(authCode);
+    public ResponseEntity<Map<String, String>> getAccessToken(@RequestBody Map<String, String> authCode) {
         Map<String, String> result = new HashMap<>();
-        result.put("accessToken", accessToken);
+        result.put("path", "/api/v1/spotify/token");
 
-        return ResponseEntity.status(HttpStatus.OK).body(result);
+        if (!authCode.containsKey("authCode")) {
+            result.put("error", "Missing authCode in body");
+            result.put("status", HttpStatus.BAD_REQUEST.toString());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
+        }
+
+        try {
+            String accessToken = spotifyService.getAccessToken(authCode);
+            result.put("accessToken", accessToken);
+            result.put("status", HttpStatus.OK.toString());
+            return ResponseEntity.status(HttpStatus.OK).body(result);
+        } catch (Exception e) {
+            result.put("error", e.getMessage());
+            result.put("status", HttpStatus.BAD_REQUEST.toString());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
+        }
     }
 }
