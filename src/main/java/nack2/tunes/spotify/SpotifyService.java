@@ -1,10 +1,11 @@
 package nack2.tunes.spotify;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -27,7 +28,7 @@ public class SpotifyService {
 
     private String state;
 
-    public void authorizeLogin(HttpServletResponse response) {
+    public String getAuthUrl() {
         String redirectUrl = API_BASE_URL + "/spotify/callback";
         String scope = "app-remote-control";
         this.state = UUID.randomUUID().toString();
@@ -39,22 +40,20 @@ public class SpotifyService {
                 "&redirect_uri=" + redirectUrl+
                 "&state=" + state;
 
-        // direct user to spotify authorize url
-        response.setHeader("Location", authUrl);
-        response.setStatus(HttpServletResponse.SC_FOUND);
+        return authUrl;
     }
 
-    public ResponseEntity<String> getAuthCode(HttpServletRequest request){
+    public String getAuthCode(HttpServletRequest request) throws Exception {
         String code = request.getParameter("code");
         String state = request.getParameter("state");
 
         if (code == null || code.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Authorization code is missing");
+            throw new Exception("Authorization code is missing");
         } else if (!this.state.equals(state)) {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid state");
+            throw new Exception("Invalid state");
         }
 
-        return ResponseEntity.ok(code);
+        return code;
     }
 
     public String getAccessToken(String authCode) {

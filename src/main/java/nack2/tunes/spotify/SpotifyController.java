@@ -1,7 +1,6 @@
 package nack2.tunes.spotify;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
@@ -23,14 +22,29 @@ public class SpotifyController {
     // OAuth flow: https://developer-assets.spotifycdn.com/images/documentation/web-api/auth-code-flow.png
 
     @GetMapping(path="auth")
-    public void login(HttpServletResponse response) {
-        spotifyService.authorizeLogin(response);
+    public ResponseEntity<Map<String, String>> authorize() {
+        String authUrl = spotifyService.getAuthUrl();
+
+        // client redirected to authUrl
+        return ResponseEntity.status(HttpStatus.FOUND).header("Location", authUrl).build();
     }
 
+    // GET /callback shouldn't be called by client, client will be redirected
+    // here automatically after granting authorization at GET /auth
     @GetMapping(path="callback")
-    public HttpEntity<String> getAuthCode(HttpServletRequest request) {
-        return spotifyService.getAuthCode(request);
+    public HttpEntity<Map<String, String>> getAuthCode(HttpServletRequest request) {
+        Map<String, String> result = new HashMap<>();
+
+        try {
+            String authCode = spotifyService.getAuthCode(request);
+            result.put("authCode", authCode);
+            return ResponseEntity.status(HttpStatus.OK).body(result);
+        } catch(Exception e) {
+            result.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
+        }
     }
+
 
     @PostMapping(path="token")
     public ResponseEntity<Map<String, String>> getAccessToken(@RequestBody String authCode) {
