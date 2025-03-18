@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
+@CrossOrigin(origins = "http://localhost:5173/")
 @RestController
 @RequestMapping(path = "spotify")
 public class SpotifyController {
@@ -22,11 +23,14 @@ public class SpotifyController {
     // OAuth flow: https://developer-assets.spotifycdn.com/images/documentation/web-api/auth-code-flow.png
 
     @GetMapping(path="auth")
-    public ResponseEntity<Map<String, String>> authorize() {
+    public ResponseEntity<Map<String, String>> getAuthUrl() {
+        Map<String, String> result = new HashMap<>();
+        result.put("path", "/api/v1/spotify/auth");
         String authUrl = spotifyService.getAuthUrl();
+        result.put("authUrl", authUrl);
+        result.put("status", HttpStatus.OK.toString());
 
-        // client redirected to authUrl
-        return ResponseEntity.status(HttpStatus.FOUND).header("Location", authUrl).build();
+        return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
     // GET /callback shouldn't be called by client, client will be redirected
