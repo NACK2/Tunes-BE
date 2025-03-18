@@ -27,19 +27,22 @@ public class SpotifyService {
     @Value("${api.base-url}")
     private String API_BASE_URL;
 
-    private String state;
+    private final String state = UUID.randomUUID().toString();
+
+    public String getState() {
+        return this.state;
+    }
 
     public String getAuthUrl() {
-        String redirectUrl = API_BASE_URL + "/spotify/callback";
+        String redirectUrl = "http://localhost:5173/";
         String scope = "app-remote-control";
-        this.state = UUID.randomUUID().toString();
 
         String authUrl = "https://accounts.spotify.com/authorize?" +
                 "response_type=code" +
-                "&client_id=" + clientId +
+                "&client_id=" + this.clientId +
                 "&scope=" + scope +
                 "&redirect_uri=" + redirectUrl+
-                "&state=" + state;
+                "&state=" + this.state;
 
         return authUrl;
     }

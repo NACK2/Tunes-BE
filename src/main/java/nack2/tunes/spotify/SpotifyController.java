@@ -23,18 +23,18 @@ public class SpotifyController {
     // OAuth flow: https://developer-assets.spotifycdn.com/images/documentation/web-api/auth-code-flow.png
 
     @GetMapping(path="auth")
-    public ResponseEntity<Map<String, String>> getAuthUrl() {
+    public ResponseEntity<Map<String, String>> getAuthUrlAndState() {
         Map<String, String> result = new HashMap<>();
         result.put("path", "/api/v1/spotify/auth");
+        String state = spotifyService.getState();
         String authUrl = spotifyService.getAuthUrl();
         result.put("authUrl", authUrl);
+        result.put("state", state);
         result.put("status", HttpStatus.OK.toString());
 
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
-    // GET /callback shouldn't be called by client, client will be redirected
-    // here automatically after granting authorization at GET /auth
     @GetMapping(path="callback")
     public HttpEntity<Map<String, String>> getAuthCode(HttpServletRequest request) {
         Map<String, String> result = new HashMap<>();
