@@ -1,11 +1,15 @@
 package nack2.tunes.spotify;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.HashMap;
+import java.util.Map;
 
+@CrossOrigin(origins = "http://localhost:5173/")
 @RestController
 @RequestMapping(path = "spotify")
 public class SpotifyController {
@@ -18,18 +22,57 @@ public class SpotifyController {
 
     // OAuth flow: https://developer-assets.spotifycdn.com/images/documentation/web-api/auth-code-flow.png
 
-    @GetMapping(path="login")
-    public void login(HttpServletResponse response) {
-        spotifyService.authorizeLogin(response);
+    @GetMapping(path="auth")
+    public ResponseEntity<Map<String, String>> getAuthUrlAndState() {
+        Map<String, String> result = new HashMap<>();
+        result.put("path", "/api/v1/spotify/auth");
+        String state = spotifyService.getState();
+        String authUrl = spotifyService.getAuthUrl();
+        result.put("authUrl", authUrl);
+        result.put("state", state);
+        result.put("status", HttpStatus.OK.toString());
+
+        return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
     @GetMapping(path="callback")
-    public HttpEntity<String> getAuthCode(HttpServletRequest request) {
-        return spotifyService.getAuthCode(request);
+    public HttpEntity<Map<String, String>> getAuthCode(HttpServletRequest request) {
+        Map<String, String> result = new HashMap<>();
+        result.put("path", "/api/v1/spotify/callback");
+
+        try {
+            String authCode = spotifyService.getAuthCode(request);
+            result.put("authCode", authCode);
+            result.put("status", HttpStatus.OK.toString());
+            return ResponseEntity.status(HttpStatus.OK).body(result);
+        } catch(Exception e) {
+            result.put("error", e.getMessage());
+            result.put("status", HttpStatus.BAD_REQUEST.toString());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
+        }
     }
 
+
     @PostMapping(path="token")
-    public HttpEntity<String> getAccessToken(@RequestBody String authCode) {
-        return spotifyService.getAccessToken(authCode);
+    public ResponseEntity<Map<String, String>> getAccessToken(@RequestBody Map<String, String> authCode) {
+        Map<String, String> result = new HashMap<>();
+        result.put("path", "/api/v1/spotify/token");
+
+        if (!authCode.containsKey("authCode")) {
+            result.put("error", "Missing authCode in body");
+            result.put("status", HttpStatus.BAD_REQUEST.toString());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
+        }
+
+        try {
+            String accessToken = spotifyService.getAccessToken(authCode);
+            result.put("accessToken", accessToken);
+            result.put("status", HttpStatus.OK.toString());
+            return ResponseEntity.status(HttpStatus.OK).body(result);
+        } catch (Exception e) {
+            result.put("error", e.getMessage());
+            result.put("status", HttpStatus.BAD_REQUEST.toString());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
+        }
     }
 }
